@@ -2,6 +2,7 @@
 # Default values
 OBSERVE_COLLECTION_ENDPOINT=""
 OBSERVE_TOKEN=""
+BRANCH="main"
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -11,6 +12,10 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     --observe_token)
       OBSERVE_TOKEN="$2"
+      shift 2
+      ;;
+    --branch)
+      BRANCH="$3"
       shift 2
       ;;
     *)
@@ -40,13 +45,6 @@ else
 fi
 
 echo $OS
-
-# SYS_ARCH=$(uname -m)
-# if [[ $SYS_ARCH = "aarch64" ]]; then
-#     ARCH="arm64"
-# else
-#     ARCH="amd64"
-# fi
 }
 
 install_apt(){
@@ -75,10 +73,7 @@ configure_otel() {
 }
 
 config_urls=(
-    "https://raw.githubusercontent.com/observeinc/host-config-scripts/yasar/resourcedetection/opentelemetry/linux/config.yaml"
-    # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/observe_logs.yaml"
-    # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/observe_metrics.yaml"
-    # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/observe_custom.yaml"
+    "https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/observe_otel_install.sh"
 )
 
 OS=$(get_os)
@@ -99,15 +94,8 @@ for url in "${config_urls[@]}"; do
     configure_otel "$url" "/etc/otelcol-contrib"
 done
 
-# Backup the original otelcol.conf file
-# cp /etc/otelcol/otelcol.conf /etc/otelcol/otelcol.conf.bak
-
-# # Specify the new value for OTELCOL_OPTIONS
-# otel_col_options="--config=/etc/otelcol/config.yaml --config=/etc/otelcol/observe_metrics.yaml --config=/etc/otelcol/observe_logs.yaml --config=/etc/otelcol/observe_custom.yaml"
-# sed -i "s|^OTELCOL_OPTIONS=.*|OTELCOL_OPTIONS=\"$otel_col_options\"|" /etc/otelcol/otelcol.conf
-
 env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
-echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//'):443" >> "$env_file"
+echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" >> "$env_file"
 echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" >> "$env_file"
 
 sudo systemctl enable otelcol-contrib
