@@ -50,7 +50,7 @@ echo $OS
 }
 
 install_apt(){
-    sudo apt-get -y install wget systemctl
+    sudo apt-get -y install wget systemctl acl
     wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.90.1/otelcol-contrib_0.90.1_linux_amd64.deb
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
 }
