@@ -1,6 +1,10 @@
 extensions:
   health_check:
 receivers:
+  filestats:
+    include: /etc/otelcol-contrib/otelcol-contrib.conf
+    collection_interval: 5m
+    initial_delay: 1s
   otlp:  # Define the "otlp" receiver
     protocols:
       http:
@@ -64,6 +68,12 @@ processors:
   
   resourcedetection/cloud:
     detectors: ["gcp", "ec2", "azure"]
+    ec2:
+      host.id: 
+      enabled: true
+    gcp:
+      host.id: 
+      enabled: true
     timeout: 2s
     override: false
 
