@@ -5,8 +5,14 @@ receivers:
     protocols:
       http:
         max_request_body_size: 10485760
+
+  filestats:
+    include: /etc/otelcol-contrib/config.yaml
+    collection_interval: 240m
+    initial_delay: 60s
+
   hostmetrics:
-    collection_interval: 20s
+    collection_interval: 60s
     scrapers:
       cpu:
         metrics:
@@ -29,7 +35,7 @@ receivers:
             enabled: true
 
   filelog:
-    include: [/var/log/**/*.log, /root/*.log, /root/logs/*.log]
+    include: [/var/log/**/*.log, /var/log/syslog]
     include_file_path: true
     retry_on_failure:
       enabled: true
@@ -49,8 +55,8 @@ processors:
 
   memory_limiter:
     check_interval: 1s
-    limit_percentage: 80
-    spike_limit_percentage: 25
+    limit_percentage: 20
+    spike_limit_percentage: 5
   
   batch:
   
@@ -67,6 +73,19 @@ processors:
     timeout: 2s
     override: false
 
+  resourcedetection/barebones:
+    detectors: [env, system]
+    system:
+      hostname_sources: ["os"]
+      resource_attributes:
+        host.id:
+          enabled: true
+        host.name:
+          enabled: false
+        os.type:
+          enabled: false
+
+
 exporters:
   logging:
     # loglevel: "DEBUG"
@@ -81,12 +100,17 @@ service:
     
     metrics:
       receivers: [hostmetrics]
-      processors: [memory_limiter, resourcedetection, resourcedetection/cloud, batch]
+      processors: [memory_limiter, resourcedetection/barebones, batch]
       exporters: [logging, otlphttp]
+
+    metrics/filestats:
+       receivers: [filestats]
+       processors: [resourcedetection, resourcedetection/cloud]
+       exporters: [logging, otlphttp]
     
     logs:
       receivers: [otlp, filelog]
-      processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
+      processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch]
       exporters: [logging, otlphttp]
 
   extensions: [health_check]

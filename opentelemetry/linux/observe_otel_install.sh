@@ -84,6 +84,7 @@ case ${OS} in
     ;;
     ubuntu|debian)
         install_apt
+        sudo apt-get install acl -y
     ;;
 esac
 
