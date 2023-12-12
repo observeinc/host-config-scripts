@@ -75,7 +75,8 @@ configure_otel() {
 }
 
 config_urls=(
-    "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/config.yaml"
+    "https://raw.githubusercontent.com/observeinc/host-config-scripts/arthur/config-updates/opentelemetry/linux/config.yaml"
+    # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/config.yaml"
     # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/observe_logs.yaml"
     # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/observe_metrics.yaml"
     # "https://raw.githubusercontent.com/yasar-observe/host-configuration-scripts/yasar/init/opentelemetry/linux/observe_custom.yaml"
