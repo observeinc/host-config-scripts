@@ -73,7 +73,7 @@ configure_otel() {
 }
 
 config_urls=(
-    "https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/observe_otel_install.sh"
+    "https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
 )
 
 OS=$(get_os)
