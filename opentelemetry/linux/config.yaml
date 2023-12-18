@@ -98,7 +98,7 @@ processors:
         host.name:
           enabled: false
         os.type:
-          enabled: false
+          enabled: true
 
 
 exporters:
