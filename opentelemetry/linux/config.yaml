@@ -17,6 +17,12 @@ processors:
   
   batch:
   
+  resource:
+    attributes:
+    - key: AGENT
+      value: OTEL_LINUX
+      action: upsert
+      
   resourcedetection:
     detectors: [env, system]
     system:
@@ -57,22 +63,22 @@ service:
     
     metrics:
       receivers: [hostmetrics]
-      processors: [memory_limiter, resourcedetection/barebones, batch]
+      processors: [memory_limiter, resourcedetection/barebones, batch, resource]
       exporters: [logging, otlphttp]
 
     metrics/filestats:
        receivers: [filestats]
-       processors: [resourcedetection, resourcedetection/cloud]
+       processors: [resourcedetection, resourcedetection/cloud, resource]
        exporters: [logging, otlphttp]
     
     logs/config:
        receivers: [filelog/config]
-       processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch]
+       processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch, resource]
        exporters: [logging, otlphttp]
     
     logs:
       receivers: [otlp, filelog]
-      processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch]
+      processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch, resource]
       exporters: [logging, otlphttp]
 
   extensions: [health_check]
