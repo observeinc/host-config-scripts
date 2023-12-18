@@ -11,6 +11,21 @@ receivers:
     collection_interval: 240m
     initial_delay: 60s
 
+  filelog/config:
+    include: [ /etc/otelcol-contrib/config.yaml ]
+    start_at: beginning
+    poll_interval: 1m
+    multiline:
+      line_end_pattern: ENDOFLINEPATTERN
+
+  prometheus/internal:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['0.0.0.0:8888']
+
   hostmetrics:
     collection_interval: 60s
     scrapers:
@@ -50,8 +65,8 @@ processors:
     log_statements:
       - context: log
         statements:
-          - truncate_all(attributes, 4095)
-          - truncate_all(resource.attributes, 4095)
+          - truncate_all(attributes, 2047)
+          - truncate_all(resource.attributes, 2047)
 
   memory_limiter:
     check_interval: 1s
@@ -101,10 +116,10 @@ service:
     metrics:
       receivers: [hostmetrics]
       processors: [memory_limiter, resourcedetection/barebones, batch]
-      exporters: [logging, otlphttp]
+      exporters: [logging, otlphttp, prometheus/internal]
 
     metrics/filestats:
-       receivers: [filestats]
+       receivers: [filestats, filelog/config]
        processors: [resourcedetection, resourcedetection/cloud]
        exporters: [logging, otlphttp]
     

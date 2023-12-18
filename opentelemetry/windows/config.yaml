@@ -1,5 +1,58 @@
 extensions:
   health_check:
+receivers:
+  otlp:  # Define the "otlp" receiver
+    protocols:
+      http:
+        max_request_body_size: 10485760
+
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['0.0.0.0:8888']
+  hostmetrics:
+    collection_interval: 20s
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+      load:
+      memory:
+        metrics:
+          system.memory.utilization:
+            enabled: true
+      disk:
+      filesystem:
+        metrics:
+          system.filesystem.utilization:
+            enabled: true
+      network:
+      paging:
+        metrics:
+          system.paging.utilization:
+            enabled: true
+  windowseventlog/application:
+    channel: Application
+    retry_on_failure:
+      enabled: true
+  windowseventlog/security:
+    channel: Security
+    retry_on_failure:
+      enabled: true
+  windowseventlog/system:
+    channel: System
+    retry_on_failure:
+      enabled: true
+  filelog:
+    include: [ 'C:\Program Files\OpenTelemetry Collector\config.yaml' ]
+    start_at: beginning
+    poll_interval: 5m
+    multiline:
+      line_end_pattern: ENDOFLINEPATTERN
 processors:
   
   transform/truncate:
@@ -56,56 +109,3 @@ service:
       processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
       exporters: [logging, otlphttp]
 
-receivers:
-  otlp:  # Define the "otlp" receiver
-    protocols:
-      http:
-        max_request_body_size: 10485760
-
-  prometheus:
-    config:
-      scrape_configs:
-        - job_name: 'otel-collector'
-          scrape_interval: 5s
-          static_configs:
-            - targets: ['0.0.0.0:8888']
-  hostmetrics:
-    collection_interval: 20s
-    scrapers:
-      cpu:
-        metrics:
-          system.cpu.utilization:
-            enabled: true
-      load:
-      memory:
-        metrics:
-          system.memory.utilization:
-            enabled: true
-      disk:
-      filesystem:
-        metrics:
-          system.filesystem.utilization:
-            enabled: true
-      network:
-      paging:
-        metrics:
-          system.paging.utilization:
-            enabled: true
-  windowseventlog/application:
-    channel: Application
-    retry_on_failure:
-      enabled: true
-  windowseventlog/security:
-    channel: Security
-    retry_on_failure:
-      enabled: true
-  windowseventlog/system:
-    channel: System
-    retry_on_failure:
-      enabled: true
-  filelog:
-    include: [ 'C:\Program Files\OpenTelemetry Collector\config.yaml' ]
-    start_at: beginning
-    poll_interval: 5m
-    multiline:
-      line_end_pattern: KEEPTHISASTHELASTLINE
