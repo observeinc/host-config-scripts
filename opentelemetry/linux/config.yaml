@@ -118,10 +118,15 @@ service:
       exporters: [logging, otlphttp, prometheus/internal]
 
     metrics/filestats:
-       receivers: [filestats, filelog/config]
+       receivers: [filestats]
        processors: [resourcedetection, resourcedetection/cloud]
        exporters: [logging, otlphttp]
-    
+       
+    logs/config:
+       receivers: [filelog/config]
+       processors: [[memory_limiter, transform/truncate, resourcedetection/barebones, batch]
+       exporters: [logging, otlphttp]
+       
     logs:
       receivers: [otlp, filelog]
       processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch]
