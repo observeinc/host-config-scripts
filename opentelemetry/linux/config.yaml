@@ -113,9 +113,9 @@ service:
   pipelines:
     
     metrics:
-      receivers: [hostmetrics]
+      receivers: [hostmetrics, prometheus/internal]
       processors: [memory_limiter, resourcedetection/barebones, batch]
-      exporters: [logging, otlphttp, prometheus/internal]
+      exporters: [logging, otlphttp]
 
     metrics/filestats:
        receivers: [filestats]
