@@ -104,6 +104,11 @@ service:
       processors: [memory_limiter, resourcedetection, resourcedetection/cloud, batch]
       exporters: [logging, otlphttp]
 
+    metrics/filestats:
+       receivers: [filestats]
+       processors: [resourcedetection, resourcedetection/cloud]
+       exporters: [logging, otlphttp]
+
     logs/filelog:
        receivers: [filelog]
        processors: [resourcedetection, resourcedetection/cloud]
