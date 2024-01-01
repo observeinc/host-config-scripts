@@ -114,7 +114,7 @@ service:
     
     metrics:
       receivers: [hostmetrics, prometheus/internal]
-      processors: [memory_limiter, resourcedetection/barebones, batch]
+      processors: [memory_limiter, resourcedetection, resourcedetection/cloud, batch]
       exporters: [logging, otlphttp]
 
     metrics/filestats:
@@ -124,12 +124,12 @@ service:
        
     logs/config:
        receivers: [filelog/config]
-       processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch]
+       processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
        exporters: [logging, otlphttp]
        
     logs:
       receivers: [otlp, filelog]
-      processors: [memory_limiter, transform/truncate, resourcedetection/barebones, batch]
+      processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
       exporters: [logging, otlphttp]
 
   extensions: [health_check]
