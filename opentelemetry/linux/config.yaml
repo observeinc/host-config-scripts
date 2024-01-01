@@ -16,7 +16,7 @@ receivers:
   filelog/config:
     include: [ /etc/otelcol-contrib/config.yaml ]
     start_at: beginning
-    poll_interval: 1m
+    poll_interval: 5m
     multiline:
       line_end_pattern: ENDOFLINEPATTERN
 
