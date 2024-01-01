@@ -1,5 +1,7 @@
 extensions:
   health_check:
+connectors:
+  count:
 receivers:
   otlp:  # Define the "otlp" receiver
     protocols:
@@ -113,7 +115,7 @@ service:
   pipelines:
     
     metrics:
-      receivers: [hostmetrics, prometheus/internal]
+      receivers: [hostmetrics, prometheus/internal,count]
       processors: [memory_limiter, resourcedetection, resourcedetection/cloud, batch]
       exporters: [logging, otlphttp]
 
@@ -130,6 +132,6 @@ service:
     logs:
       receivers: [otlp, filelog]
       processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
-      exporters: [logging, otlphttp]
+      exporters: [logging, otlphttp, count]
 
   extensions: [health_check]
