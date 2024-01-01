@@ -1,5 +1,7 @@
 extensions:
   health_check:
+connectors:
+  count:
 receivers:
   otlp:  # Define the "otlp" receiver
     protocols:
@@ -94,7 +96,7 @@ service:
   pipelines:
     
     metrics:
-      receivers: [hostmetrics, prometheus]
+      receivers: [hostmetrics, prometheus, count]
       processors: [memory_limiter, resourcedetection, resourcedetection/cloud, batch]
       exporters: [logging, otlphttp]
 
@@ -106,5 +108,5 @@ service:
     logs:
       receivers: [otlp, windowseventlog/application, windowseventlog/security, windowseventlog/system]
       processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
-      exporters: [logging, otlphttp]
+      exporters: [logging, otlphttp, count]
 
