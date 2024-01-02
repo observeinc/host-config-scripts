@@ -9,7 +9,7 @@ receivers:
         max_request_body_size: 10485760
   filestats:
     include: [ 'C:\Program Files\OpenTelemetry Collector\config.yaml' ]
-    collection_interval: 240m
+    collection_interval: 1m
     initial_delay: 60s
     
   prometheus:
