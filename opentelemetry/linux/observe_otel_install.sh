@@ -7,7 +7,8 @@ REPLACE_FILE=""
 UNINSTALL=""
 
 destination_dir="/etc/otelcol-contrib"
-env_file="${destination_dir}/otelcol-contrib.conf"
+service_config_file="${destination_dir}/otelcol-contrib.conf"
+config_file="${destination_dir}/config.yaml"
 
 echo "destination_dir = ${destination_dir}"
 echo "env_file = ${env_file}"
@@ -60,19 +61,21 @@ echo $OS
 }
 
 install_apt(){
+    config_url="https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
+
+
     sudo apt-get -y install wget systemctl acl
     wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.90.1/otelcol-contrib_0.90.1_linux_amd64.deb
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
 
-    sudo mv $destination_dir/config.yaml $destination_dir/config.ORIG
-    sudo mv $destination_dir/otelcol-contrib.conf $destination_dir/otelcol-contrib.ORIG
+    sudo mv "$config_file" "$config_file.ORIG"
+    sudo cp "$service_config_file" "$service_config_file.ORIG"
 
-    url="https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
+    curl -L "$config_url" | sudo tee "$config_file" >> /dev/null
 
-    curl -L "$url" | sudo tee "$destination" >> /dev/null
-
-    echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$env_file" >> /dev/null
-    echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
+    echo "OTELCOL_OPTIONS=\"--config=/etc/otelcol-contrib/config.yaml\"" | sudo tee -a "$service_config_file" >> /dev/null
+    echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$service_config_file" >> /dev/null
+    echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$service_config_file" >> /dev/null
 
 }
 

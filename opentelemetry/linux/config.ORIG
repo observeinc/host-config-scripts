@@ -107,9 +107,9 @@ exporters:
   logging:
     # loglevel: "DEBUG"
   otlphttp:
-    endpoint: "OBSERVE_COLLECTION_ENDPOINT/v2/otel"
+    endpoint: "${OBSERVE_COLLECTION_ENDPOINT}/v2/otel"
     headers:
-      authorization: "Bearer OBSERVE_TOKEN"
+      authorization: "Bearer ${OBSERVE_TOKEN}"
 
 service:
   pipelines:
