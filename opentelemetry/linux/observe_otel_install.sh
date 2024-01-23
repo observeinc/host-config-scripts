@@ -121,8 +121,8 @@ done
 # echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
 cd "$destination_dir"
 
-sudo sed -i "s/OBSERVE_COLLECTION_ENDPOINT/${OBSERVE_COLLECTION_ENDPOINT}/g" ./*
-sudo sed -i "s/OBSERVE_TOKEN/${OBSERVE_TOKEN}/g" ./*
+sudo sed -i "s/OBSERVE_COLLECTION_ENDPOINT/$OBSERVE_COLLECTION_ENDPOINT/g" ./*
+sudo sed -i "s/OBSERVE_TOKEN/$OBSERVE_TOKEN/g" ./*
 
 # sudo setfacl -Rm u:otelcol-contrib:rX "$destination_dir"
 
