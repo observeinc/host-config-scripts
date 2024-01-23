@@ -87,7 +87,7 @@ configure_otel() {
 
     rm -f "$destination"
     
-    curl -L "$url" -o "$destination"
+    curl -L "$url" | sudo tee "$destination" >> /dev/null
 }
 
 config_urls=(
