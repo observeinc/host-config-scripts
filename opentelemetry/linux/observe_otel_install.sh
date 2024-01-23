@@ -119,7 +119,7 @@ done
 
 # echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee "$env_file" >> /dev/null
 # echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
-
+cd "$destination_dir"
 sed -i "s/OBSERVE_COLLECTION_ENDPOINT/${OBSERVE_COLLECTION_ENDPOINT}/g" ./*
 sed -i "s/OBSERVE_TOKEN/${OBSERVE_TOKEN}/g" ./*
 
