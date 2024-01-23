@@ -69,13 +69,16 @@ install_apt(){
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
 
     sudo mv "$config_file" "$config_file.ORIG"
-    sudo cp "$service_config_file" "$service_config_file.ORIG"
+    # sudo cp "$service_config_file" "$service_config_file.ORIG"
+
+    sudo sed -i "s,OBSERVE_COLLECTION_ENDPOINT,$OBSERVE_COLLECTION_ENDPOINT,g" ./*
+    sudo sed -i "s,OBSERVE_TOKEN,$OBSERVE_TOKEN,g" ./*
 
     curl -L "$config_url" | sudo tee "$config_file" >> /dev/null
 
-    echo "OTELCOL_OPTIONS=\"--config=/etc/otelcol-contrib/config.yaml\"" | sudo tee -a "$service_config_file" >> /dev/null
-    echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$service_config_file" >> /dev/null
-    echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$service_config_file" >> /dev/null
+    # echo "OTELCOL_OPTIONS=\"--config=/etc/otelcol-contrib/config.yaml\"" | sudo tee -a "$service_config_file" >> /dev/null
+    # echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$service_config_file" >> /dev/null
+    # echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$service_config_file" >> /dev/null
 
 }
 
@@ -131,8 +134,7 @@ sudo setfacl -Rm u:otelcol-contrib:rX /var/log
 #     configure_otel "$url"
 # done
 
-# sudo sed -i "s,OBSERVE_COLLECTION_ENDPOINT,$OBSERVE_COLLECTION_ENDPOINT,g" ./*
-# sudo sed -i "s,OBSERVE_TOKEN,$OBSERVE_TOKEN,g" ./*
+
 
 # sudo setfacl -Rm u:otelcol-contrib:rX "$destination_dir"
 
