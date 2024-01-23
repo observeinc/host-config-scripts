@@ -67,18 +67,149 @@ install_apt(){
     sudo apt-get -y install wget systemctl acl
     wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.90.1/otelcol-contrib_0.90.1_linux_amd64.deb
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
+}
 
+create_config(){
     sudo mv "$config_file" "$config_file.ORIG"
-    # sudo cp "$service_config_file" "$service_config_file.ORIG"
+    sudo tee "$config_file" > /dev/null << EOT
+extensions:
+  health_check:
+connectors:
+  count:
+receivers:
+  otlp:  # Define the "otlp" receiver
+    protocols:
+      http:
+        max_request_body_size: 10485760
 
-    sudo sed -i "s,OBSERVE_COLLECTION_ENDPOINT,$OBSERVE_COLLECTION_ENDPOINT,g" ./*
-    sudo sed -i "s,OBSERVE_TOKEN,$OBSERVE_TOKEN,g" ./*
+  filestats:
+    include: /etc/otelcol-contrib/config.yaml
+    collection_interval: 240m
+    initial_delay: 60s
 
-    curl -L "$config_url" | sudo tee "$config_file" >> /dev/null
+  filelog/config:
+    include: [ /etc/otelcol-contrib/config.yaml ]
+    start_at: beginning
+    poll_interval: 5m
+    multiline:
+      line_end_pattern: ENDOFLINEPATTERN
 
-    # echo "OTELCOL_OPTIONS=\"--config=/etc/otelcol-contrib/config.yaml\"" | sudo tee -a "$service_config_file" >> /dev/null
-    # echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$service_config_file" >> /dev/null
-    # echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$service_config_file" >> /dev/null
+  prometheus/internal:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['0.0.0.0:8888']
+
+  hostmetrics:
+    collection_interval: 60s
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+      load:
+      memory:
+        metrics:
+          system.memory.utilization:
+            enabled: true
+      disk:
+      filesystem:
+        metrics:
+          system.filesystem.utilization:
+            enabled: true
+      network:
+      paging:
+        metrics:
+          system.paging.utilization:
+            enabled: true
+
+  filelog:
+    include: [/var/log/**/*.log, /var/log/syslog]
+    include_file_path: true
+    retry_on_failure:
+      enabled: true
+    max_log_size: 4MiB
+    operators:
+      - type: filter
+        expr: 'body matches "otel-contrib"'
+
+processors:
+  
+  transform/truncate:
+    log_statements:
+      - context: log
+        statements:
+          - truncate_all(attributes, 2047)
+          - truncate_all(resource.attributes, 2047)
+
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 20
+    spike_limit_percentage: 5
+  
+  batch:
+  
+  resourcedetection:
+    detectors: [env, system]
+    system:
+      hostname_sources: ["os"]
+      resource_attributes:
+        host.id:
+          enabled: true
+  
+  resourcedetection/cloud:
+    detectors: ["gcp", "ec2", "azure"]
+    timeout: 2s
+    override: false
+
+  resourcedetection/barebones:
+    detectors: [env, system]
+    system:
+      hostname_sources: ["os"]
+      resource_attributes:
+        host.id:
+          enabled: true
+        host.name:
+          enabled: false
+        os.type:
+          enabled: true
+
+exporters:
+  logging:
+    # loglevel: "DEBUG"
+  otlphttp:
+    endpoint: "${OBSERVE_COLLECTION_ENDPOINT}/v2/otel"
+    headers:
+      authorization: "Bearer ${OBSERVE_TOKEN}"
+
+service:
+  pipelines:
+    
+    metrics:
+      receivers: [hostmetrics, prometheus/internal,count]
+      processors: [memory_limiter, resourcedetection, resourcedetection/cloud, batch]
+      exporters: [logging, otlphttp]
+
+    metrics/filestats:
+       receivers: [filestats]
+       processors: [resourcedetection, resourcedetection/cloud]
+       exporters: [logging, otlphttp]
+       
+    logs/config:
+       receivers: [filelog/config]
+       processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
+       exporters: [logging, otlphttp]
+       
+    logs:
+      receivers: [otlp, filelog]
+      processors: [memory_limiter, transform/truncate, resourcedetection, resourcedetection/cloud, batch]
+      exporters: [logging, otlphttp, count]
+
+  extensions: [health_check]
+
+EOT
 
 }
 
@@ -124,6 +255,7 @@ case ${OS} in
         else
           install_apt
           sudo apt-get install acl -y
+          create_config
         fi
     ;;
 esac
