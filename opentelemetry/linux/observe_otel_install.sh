@@ -7,7 +7,10 @@ REPLACE_FILE=""
 UNINSTALL=""
 
 destination_dir="/etc/otelcol-contrib"
-env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
+env_file="${destination_dir}/otelcol-contrib.conf"
+
+echo "destination_dir = ${destination_dir}"
+echo "env_file = ${env_file}"
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
