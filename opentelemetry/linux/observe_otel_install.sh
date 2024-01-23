@@ -75,7 +75,7 @@ configure_otel() {
     destination="$destination_dir/$filename"
 
     if [ -z "$CLOBBER" ]; then
-      rm -f "$destination"
+      sudo rm -f "$destination"
     fi
     
     curl -L "$url" -o "$destination"
