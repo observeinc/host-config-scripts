@@ -3,6 +3,7 @@
 OBSERVE_COLLECTION_ENDPOINT=""
 OBSERVE_TOKEN=""
 BRANCH="main"
+CLOBBER=""
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -16,6 +17,10 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     --branch)
       BRANCH="$3"
+      shift 2
+      ;;
+    --clobber)
+      CLOBBER="--clobber"
       shift 2
       ;;
     *)
@@ -68,8 +73,8 @@ configure_otel() {
     # Construct destination
     filename=$(basename "$url")
     destination="$destination_dir/$filename"
-
-    curl -L "$url" -o "$destination"
+    
+    curl -L "$url" -o "$destination" $CLOBBER
 }
 
 config_urls=(
