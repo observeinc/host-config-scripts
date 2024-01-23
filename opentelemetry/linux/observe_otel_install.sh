@@ -26,10 +26,6 @@ while [[ "$#" -gt 0 ]]; do
       BRANCH="$3"
       shift 2
       ;;
-    --replace_file)
-      REPLACE_FILE="true"
-      shift 2
-      ;;
     --uninstall)
       UNINSTALL="true"
       shift 2
@@ -88,6 +84,8 @@ configure_otel() {
     # Construct destination
     filename=$(basename "$url")
     destination="$destination_dir/$filename"
+
+    rm -f "$destination"
     
     curl -L "$url" -o "$destination"
 }
