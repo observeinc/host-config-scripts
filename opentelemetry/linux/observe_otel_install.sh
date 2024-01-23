@@ -117,6 +117,10 @@ for url in "${config_urls[@]}"; do
     configure_otel "$url"
 done
 
+sudo mv $destination_dir/config.yaml $destination_dir/config.ORIG
+sudo mv $destination_dir/otelcol-contrib.conf $destination_dir/otelcol-contrib.ORIG
+
+
 echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$env_file" >> /dev/null
 echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
 # cd "$destination_dir"
