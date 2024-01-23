@@ -63,6 +63,17 @@ install_apt(){
     sudo apt-get -y install wget systemctl acl
     wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.90.1/otelcol-contrib_0.90.1_linux_amd64.deb
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
+
+    sudo mv $destination_dir/config.yaml $destination_dir/config.ORIG
+    sudo mv $destination_dir/otelcol-contrib.conf $destination_dir/otelcol-contrib.ORIG
+
+    url="https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
+
+    curl -L "$url" | sudo tee "$destination" >> /dev/null
+
+    echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$env_file" >> /dev/null
+    echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
+
 }
 
 uninstall_apt(){
@@ -76,24 +87,24 @@ install_yum(){
     sudo rpm -ivh otelcol-contrib_0.90.1_linux_amd64.rpm
 }
 
-configure_otel() {
-    url=$1
+# configure_otel() {
+#     url=$1
 
-    mkdir -p "$destination_dir"
+#     mkdir -p "$destination_dir"
 
-    # Construct destination
-    filename=$(basename "$url")
-    destination="$destination_dir/$filename"
+#     # Construct destination
+#     filename=$(basename "$url")
+#     destination="$destination_dir/$filename"
 
-    sudo rm -f "$destination"
-    sudo rm -f "$env_file"
+#     sudo rm -f "$destination"
+#     sudo rm -f "$env_file"
     
-    curl -L "$url" | sudo tee "$destination" >> /dev/null
-}
+#     curl -L "$url" | sudo tee "$destination" >> /dev/null
+# }
 
-config_urls=(
-    "https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
-)
+# config_urls=(
+#     "https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
+# )
 
 OS=$(get_os)
 
@@ -113,19 +124,9 @@ esac
 
 sudo setfacl -Rm u:otelcol-contrib:rX /var/log
 
-for url in "${config_urls[@]}"; do
-    configure_otel "$url"
-done
-
-sudo mv $destination_dir/config.yaml $destination_dir/config.ORIG
-sudo mv $destination_dir/otelcol-contrib.conf $destination_dir/otelcol-contrib.ORIG
-
-
-echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$env_file" >> /dev/null
-echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
-# cd "$destination_dir"
-
-
+# for url in "${config_urls[@]}"; do
+#     configure_otel "$url"
+# done
 
 # sudo sed -i "s,OBSERVE_COLLECTION_ENDPOINT,$OBSERVE_COLLECTION_ENDPOINT,g" ./*
 # sudo sed -i "s,OBSERVE_TOKEN,$OBSERVE_TOKEN,g" ./*
