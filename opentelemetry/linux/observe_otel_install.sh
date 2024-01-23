@@ -66,7 +66,7 @@ install_apt(){
 }
 
 uninstall_apt(){
-    sudo dpkg -r otelcol-contrib_0.90.1_linux_amd64.deb
+    sudo dpkg --purge otelcol-contrib
     rm -fR "$destination_dir"
 }
 
@@ -117,14 +117,14 @@ for url in "${config_urls[@]}"; do
     configure_otel "$url"
 done
 
-# echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee "$env_file" >> /dev/null
-# echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
-cd "$destination_dir"
+echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$env_file" >> /dev/null
+echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
+# cd "$destination_dir"
 
 
 
-sudo sed -i "s,OBSERVE_COLLECTION_ENDPOINT,$OBSERVE_COLLECTION_ENDPOINT,g" ./*
-sudo sed -i "s,OBSERVE_TOKEN,$OBSERVE_TOKEN,g" ./*
+# sudo sed -i "s,OBSERVE_COLLECTION_ENDPOINT,$OBSERVE_COLLECTION_ENDPOINT,g" ./*
+# sudo sed -i "s,OBSERVE_TOKEN,$OBSERVE_TOKEN,g" ./*
 
 # sudo setfacl -Rm u:otelcol-contrib:rX "$destination_dir"
 
