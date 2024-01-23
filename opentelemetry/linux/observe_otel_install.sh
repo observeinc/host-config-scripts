@@ -67,7 +67,7 @@ install_apt(){
 
 uninstall_apt(){
     sudo dpkg -r otelcol-contrib_0.90.1_linux_amd64.deb
-    rm -f "$env_file"
+    rm -fR "$destination_dir"
 }
 
 install_yum(){
@@ -86,6 +86,7 @@ configure_otel() {
     destination="$destination_dir/$filename"
 
     sudo rm -f "$destination"
+    sudo rm -f "$env_file"
     
     curl -L "$url" | sudo tee "$destination" >> /dev/null
 }
