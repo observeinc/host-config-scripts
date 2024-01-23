@@ -73,8 +73,12 @@ configure_otel() {
     # Construct destination
     filename=$(basename "$url")
     destination="$destination_dir/$filename"
+
+    if [ -z "$CLOBBER" ]; then
+      rm -f "$destination"
+    fi
     
-    curl -L "$url" "$CLOBBER" -o "$destination"
+    curl -L "$url" -o "$destination"
 }
 
 config_urls=(
