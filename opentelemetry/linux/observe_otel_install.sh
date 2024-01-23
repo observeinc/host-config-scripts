@@ -3,15 +3,7 @@
 OBSERVE_COLLECTION_ENDPOINT=""
 OBSERVE_TOKEN=""
 BRANCH="main"
-REPLACE_FILE=""
 UNINSTALL=""
-
-destination_dir="/etc/otelcol-contrib"
-service_config_file="${destination_dir}/otelcol-contrib.conf"
-config_file="${destination_dir}/config.yaml"
-
-echo "destination_dir = ${destination_dir}"
-echo "env_file = ${env_file}"
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -62,9 +54,6 @@ echo $OS
 }
 
 install_apt(){
-    config_url="https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
-
-
     sudo apt-get -y install wget systemctl acl
     wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.90.1/otelcol-contrib_0.90.1_linux_amd64.deb
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
@@ -229,24 +218,35 @@ OS=$(get_os)
 
 case ${OS} in
     amzn|amazonlinux|rhel|centos)
+        destination_dir="/etc/otelcol-contrib"
+        config_file="${destination_dir}/config.yaml"
         install_yum
+        sudo yum install acl -y
+        create_config
     ;;
     ubuntu|debian)
         if [ "$UNINSTALL" = "true" ]; then
           uninstall_apt
+          sudo apt -y remove acl
         else
           destination_dir="/etc/otelcol-contrib"
           config_file="${destination_dir}/config.yaml"
+          
           install_apt
+          
           sudo apt-get install acl -y
+          
           create_config
+          
+          sudo setfacl -Rm u:otelcol-contrib:rX /var/log
+
+          sudo systemctl enable otelcol-contrib
+          sudo systemctl restart otelcol-contrib
+
         fi
     ;;
 esac
 
-sudo setfacl -Rm u:otelcol-contrib:rX /var/log
 
-sudo systemctl enable otelcol-contrib
-sudo systemctl restart otelcol-contrib
 
 
