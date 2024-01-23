@@ -118,12 +118,12 @@ for url in "${config_urls[@]}"; do
 done
 
 
-echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee "$env_file" >> /dev/null
-echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
+# echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee "$env_file" >> /dev/null
+# echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
 
-sudo setfacl -Rm u:otelcol-contrib:rX "$env_file"
+# sudo setfacl -Rm u:otelcol-contrib:rX "$env_file"
 
-sudo systemctl enable otelcol-contrib
-sudo systemctl restart otelcol-contrib
+# sudo systemctl enable otelcol-contrib
+# sudo systemctl restart otelcol-contrib
 
 
