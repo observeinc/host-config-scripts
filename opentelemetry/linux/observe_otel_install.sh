@@ -17,6 +17,7 @@ while [[ "$#" -gt 0 ]]; do
   case $1 in
     --observe_collection_endpoint)
       OBSERVE_COLLECTION_ENDPOINT="$2"
+      OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')
       shift 2
       ;;
     --observe_token)
@@ -224,25 +225,6 @@ install_yum(){
     sudo rpm -ivh otelcol-contrib_0.90.1_linux_amd64.rpm
 }
 
-# configure_otel() {
-#     url=$1
-
-#     mkdir -p "$destination_dir"
-
-#     # Construct destination
-#     filename=$(basename "$url")
-#     destination="$destination_dir/$filename"
-
-#     sudo rm -f "$destination"
-#     sudo rm -f "$env_file"
-    
-#     curl -L "$url" | sudo tee "$destination" >> /dev/null
-# }
-
-# config_urls=(
-#     "https://raw.githubusercontent.com/observeinc/host-config-scripts/${BRANCH}/opentelemetry/linux/config.yaml"
-# )
-
 OS=$(get_os)
 
 case ${OS} in
@@ -253,6 +235,8 @@ case ${OS} in
         if [ "$UNINSTALL" = "true" ]; then
           uninstall_apt
         else
+          destination_dir="/etc/otelcol-contrib"
+          config_file="${destination_dir}/config.yaml"
           install_apt
           sudo apt-get install acl -y
           create_config
@@ -261,14 +245,6 @@ case ${OS} in
 esac
 
 sudo setfacl -Rm u:otelcol-contrib:rX /var/log
-
-# for url in "${config_urls[@]}"; do
-#     configure_otel "$url"
-# done
-
-
-
-# sudo setfacl -Rm u:otelcol-contrib:rX "$destination_dir"
 
 sudo systemctl enable otelcol-contrib
 sudo systemctl restart otelcol-contrib
