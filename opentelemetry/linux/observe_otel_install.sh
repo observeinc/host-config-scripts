@@ -3,7 +3,7 @@
 OBSERVE_COLLECTION_ENDPOINT=""
 OBSERVE_TOKEN=""
 BRANCH="main"
-CLOBBER=""
+REPLACE_FILE=""
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -19,8 +19,8 @@ while [[ "$#" -gt 0 ]]; do
       BRANCH="$3"
       shift 2
       ;;
-    --clobber)
-      CLOBBER="--clobber"
+    --replace_file)
+      REPLACE_FILE="$2"
       shift 2
       ;;
     *)
