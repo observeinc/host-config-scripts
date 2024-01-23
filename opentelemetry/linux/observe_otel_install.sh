@@ -20,7 +20,7 @@ while [[ "$#" -gt 0 ]]; do
       shift 2
       ;;
     --replace_file)
-      REPLACE_FILE="$2"
+      REPLACE_FILE="true"
       shift 2
       ;;
     *)
