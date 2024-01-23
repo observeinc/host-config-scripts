@@ -5,6 +5,8 @@ OBSERVE_TOKEN=""
 BRANCH="main"
 REPLACE_FILE=""
 
+env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
+
 while [[ "$#" -gt 0 ]]; do
   case $1 in
     --observe_collection_endpoint)
@@ -58,6 +60,11 @@ install_apt(){
     sudo dpkg -i otelcol-contrib_0.90.1_linux_amd64.deb
 }
 
+uninstall_apt(){
+    sudo dpkg -r otelcol-contrib_0.90.1_linux_amd64.deb
+    rm -f "$env_file"
+}
+
 install_yum(){
     sudo yum -y install wget systemctl
     wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.90.1/otelcol-contrib_0.90.1_linux_amd64.rpm
@@ -103,9 +110,14 @@ for url in "${config_urls[@]}"; do
     configure_otel "$url" "/etc/otelcol-contrib"
 done
 
-env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
+
 echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee -a "$env_file" >> /dev/null
 echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
 
 sudo systemctl enable otelcol-contrib
 sudo systemctl restart otelcol-contrib
+
+sudo rm -f /etc/otelcol-contrib/config.yaml
+sudo rm -f /etc/otelcol-contrib/otelcol-contrib.conf
+
+
