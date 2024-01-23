@@ -82,17 +82,12 @@ install_yum(){
 
 configure_otel() {
     url=$1
-    destination_dir=$2
 
     mkdir -p "$destination_dir"
 
     # Construct destination
     filename=$(basename "$url")
     destination="$destination_dir/$filename"
-
-    if [ "$REPLACE_FILE" = "true" ]; then
-      sudo rm -f "$destination"
-    fi
     
     curl -L "$url" -o "$destination"
 }
@@ -120,7 +115,7 @@ esac
 sudo setfacl -Rm u:otelcol-contrib:rX /var/log
 
 for url in "${config_urls[@]}"; do
-    configure_otel "$url" "/etc/otelcol-contrib"
+    configure_otel "$url"
 done
 
 
