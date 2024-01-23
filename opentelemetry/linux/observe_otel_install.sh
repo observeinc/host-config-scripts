@@ -74,7 +74,7 @@ configure_otel() {
     filename=$(basename "$url")
     destination="$destination_dir/$filename"
 
-    if [ -z "$CLOBBER" ]; then
+    if [ "$REPLACE_FILE" = "true" ]; then
       sudo rm -f "$destination"
     fi
     
