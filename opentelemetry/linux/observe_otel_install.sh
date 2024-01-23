@@ -6,6 +6,7 @@ BRANCH="main"
 REPLACE_FILE=""
 UNINSTALL=""
 
+destination_dir="/etc/otelcol-contrib"
 env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
 
 while [[ "$#" -gt 0 ]]; do
