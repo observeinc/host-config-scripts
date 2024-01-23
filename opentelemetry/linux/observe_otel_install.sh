@@ -4,6 +4,7 @@ OBSERVE_COLLECTION_ENDPOINT=""
 OBSERVE_TOKEN=""
 BRANCH="main"
 REPLACE_FILE=""
+UNINSTALL=""
 
 env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
 
@@ -23,6 +24,10 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     --replace_file)
       REPLACE_FILE="true"
+      shift 2
+      ;;
+    --uninstall)
+      UNINSTALL="true"
       shift 2
       ;;
     *)
@@ -99,8 +104,12 @@ case ${OS} in
         install_yum
     ;;
     ubuntu|debian)
-        install_apt
-        sudo apt-get install acl -y
+        if [ "$UNINSTALL" = "true" ]; then
+          uninstall_apt
+        else
+          install_apt
+          sudo apt-get install acl -y
+        fi
     ;;
 esac
 
@@ -116,8 +125,5 @@ echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
 
 sudo systemctl enable otelcol-contrib
 sudo systemctl restart otelcol-contrib
-
-sudo rm -f /etc/otelcol-contrib/config.yaml
-sudo rm -f /etc/otelcol-contrib/otelcol-contrib.conf
 
 
