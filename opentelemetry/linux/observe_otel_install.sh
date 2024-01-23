@@ -85,7 +85,7 @@ configure_otel() {
     filename=$(basename "$url")
     destination="$destination_dir/$filename"
 
-    rm -f "$destination"
+    sudo rm -f "$destination"
     
     curl -L "$url" | sudo tee "$destination" >> /dev/null
 }
