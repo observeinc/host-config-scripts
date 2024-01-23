@@ -117,19 +117,12 @@ for url in "${config_urls[@]}"; do
     configure_otel "$url"
 done
 
-env_file="/etc/otelcol-contrib/otelcol-contrib.conf"
-echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" >> "$env_file"
-echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" >> "$env_file"
+echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee "$env_file" >> /dev/null
+echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
+
+sudo setfacl -Rm u:otelcol-contrib:rX "$env_file"
 
 sudo systemctl enable otelcol-contrib
 sudo systemctl restart otelcol-contrib
-
-# echo "OBSERVE_COLLECTION_ENDPOINT=$(echo "$OBSERVE_COLLECTION_ENDPOINT" | sed 's/\/\?$//')" | sudo tee "$env_file" >> /dev/null
-# echo "OBSERVE_TOKEN=$OBSERVE_TOKEN" | sudo tee -a "$env_file" >> /dev/null
-
-# sudo setfacl -Rm u:otelcol-contrib:rX "$env_file"
-
-# sudo systemctl enable otelcol-contrib
-# sudo systemctl restart otelcol-contrib
 
 
